@@ -5,24 +5,19 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import co.za.fat.googlebooks_api.data.Book
-import co.za.fat.googlebooks_api.data.BooksDatabase
 import co.za.fat.googlebooks_api.repository.BooksRepository
 
-class BooksViewModel(application: Application) : AndroidViewModel(application) {
-    lateinit var books: LiveData<List<Book>>
+class BooksViewModel(repository: BooksRepository, application: Application) :
+    AndroidViewModel(application) {
+    private var _books: MutableLiveData<List<Book>> = MutableLiveData()
+    val books: LiveData<List<Book>> get() = _books
+
 
     private var _isLoading = MutableLiveData<Boolean>(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
-    private val repository: BooksRepository
-    suspend fun addBook(book: Book) {
-        repository.addBook(book)
-    }
-
     init {
-        val bookDao = BooksDatabase.getDatabase(application).bookDao()
-        repository = BooksRepository(bookDao)
-        books = repository.getAllBooks
+        _books = repository.getBooks("spidernman") as MutableLiveData<List<Book>>
     }
 
     fun setLoadingState() {

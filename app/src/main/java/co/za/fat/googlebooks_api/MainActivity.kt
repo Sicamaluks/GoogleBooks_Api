@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
 
 //            ?.let { booksNetworkService.searchBooks(it) }
         booksNetworkService
-            .searchBooks(searchTerm.toString())
+            .getBooksFromApi(searchTerm.toString())
             .enqueue(object : Callback<BookSearchResponse> {
                 override fun onResponse(
                     call: Call<BookSearchResponse>,
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                                 val book =
                                     BookFromNetworkModelMapper().NetworkModelToBook(item.volumeInfo)
                                 book.keyWords.add(searchTerm.toString())
-                                viewModel.addBook(book)
+                                viewModel.books
 
 
                             }

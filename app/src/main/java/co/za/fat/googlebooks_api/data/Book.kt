@@ -28,6 +28,6 @@ data class Book(
     val imageLinks: String,
     @ColumnInfo(defaultValue = "add key words")
     var keyWords: ArrayList<String> = arrayListOf()
-)
+) : java.io.Serializable
 
 
