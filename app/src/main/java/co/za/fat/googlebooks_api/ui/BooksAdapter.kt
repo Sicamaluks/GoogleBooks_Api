@@ -94,12 +94,12 @@ class BooksAdapter(private val context: Context) :
 
     override fun getItemCount() = bookList.size
 
-    fun setData(book: List<Book>, keyWord: String, viewModel: BooksViewModel) {
-        viewModel.isLoading
+    fun setData(book: List<Book>) {
+//        viewModel.isLoading
         this.bookList = book
-            .filter {
-                it.keyWords.contains(keyWord)
-            }
+//            .filter {
+//                it.keyWords.contains(keyWord)
+//            }
         notifyDataSetChanged()
     }
 }

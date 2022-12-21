@@ -1,38 +1,44 @@
 package co.za.fat.googlebooks_api.ui
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import co.za.fat.googlebooks_api.data.Book
-import co.za.fat.googlebooks_api.repository.BooksRepository
+import co.za.fat.googlebooks_api.network.api.BooksNetworkService
+import co.za.fat.googlebooks_api.utils.BookFromNetworkModelMapper
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BooksViewModel(repository: BooksRepository, application: Application) :
-    AndroidViewModel(application) {
-    private var _books: MutableLiveData<List<Book>> = MutableLiveData()
+
+class BooksViewModel @Inject constructor(
+    booksNetworkService: BooksNetworkService
+) : ViewModel() {
+
+    private var searchTerm: String? = null
+    private var _books: MutableLiveData<List<Book>> = MutableLiveData<List<Book>>()
     val books: LiveData<List<Book>> get() = _books
 
-
-    private var _isLoading = MutableLiveData<Boolean>(false)
-    val isLoading: LiveData<Boolean> = _isLoading
-
-    init {
-        _books = repository.getBooks("spidernman") as MutableLiveData<List<Book>>
+    fun updateSearchData(searchTerm: String) {
+        this.searchTerm = searchTerm
     }
 
-    fun setLoadingState() {
-        _isLoading.value = true
+    init {
+
+        viewModelScope.launch {
+            Log.d("ViewModel", "booksViewModel: initiated ")
+            val response = booksNetworkService.getBooksFromApi("spiderman").items
+
+            val books = mutableListOf<Book>()
+            for (item in response) {
+                books.add(BookFromNetworkModelMapper().NetworkModelToBook(item.volumeInfo))
+                println(BookFromNetworkModelMapper().NetworkModelToBook(item.volumeInfo))
+            }
+            _books.value = books
+
+        }
+
     }
 }
 
-//class BooksViewModelFactory(
-//    private val bookRepository: BooksRepository
-//) : ViewModelProvider.Factory {
-//    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-//        if (modelClass.isAssignableFrom(BooksViewModel::class.java)) {
-//            @Suppress("UNCHECKED_CAST")
-//            return BooksViewModel(bookRepository) as T
-//        }
-//        throw IllegalArgumentException("Unknown ViewModel class")
-//    }
-//}
